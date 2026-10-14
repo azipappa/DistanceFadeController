@@ -12,7 +12,7 @@ git tag v0.1.0
 git push origin v0.1.0
 ```
 
-`OWNER/REPOSITORY` を作成したリポジトリに置き換えてください。リモート設定・pushはまだ実行していません。
+`OWNER/REPOSITORY` を作成したリポジトリに置き換えてください。この作業環境ではoriginは `https://github.com/azipappa/DistanceFadeController.git` に設定済みです。
 
 ## 自動処理
 
@@ -25,6 +25,8 @@ git push origin v0.1.0
 
 `0.1.0` のような `0.x.x` はβ版として **Pre-release** に設定します。`1.0.0-beta.1` のようなプレリリース識別子も同様です。`1.0.0` 以降でプレリリース識別子のないものは通常リリースになります。
 標準の `GITHUB_TOKEN` を使用するため、追加のトークンやSecretsは不要です。リポジトリでGitHub Actionsとworkflowの書き込み権限が許可されている必要があります。
+
+`Settings > Secrets and variables > Actions` には **Secrets・Variablesとも追加不要**です。`GITHUB_TOKEN` を手動登録する必要もありません。workflow内に `permissions: contents: write` を指定済みです。
 
 `main` のpush・Pull Requestではパッケージ作成を確認します。Unity Editorテストは自動実行しません。公開前に対象Unity環境で検証してください。
 
@@ -49,6 +51,20 @@ py -3 scripts/build_release.py --tag v0.1.0
 
 ## VPM / VCC配布
 
-GitHub ReleaseのZIP公開と、VCCが読み込むVPMリポジトリは別の設定です。
-VPMリポジトリの各バージョンエントリーに `package.json` の内容とGitHub ReleaseのZIP URL・SHA256を登録し、リポジトリJSONをホストする必要があります。
-今回のworkflowはVPMリポジトリJSONやGitHub Pagesを更新しません。
+VPM Listingは `azipappa/azipa-tools-vpm` の `source.json` に登録しています。Listing側はZIP内の `package.json` を読み、ダウンロードURL・SHA256を付けてGitHub Pagesへ公開します。Releaseに別ファイルとしてpackage.jsonを添付する必要はありません。
+
+1. このリポジトリの変更をcommit・pushし、`v0.1.0`タグをpush。
+2. GitHub ReleaseへのZIP添付を確認。
+3. `azipa-tools-vpm` の今回の変更をcommit・push。
+4. Listingの `Build Repo Listing` を手動実行するか、毎時の自動更新を待つ。
+
+Listing側も追加のSecrets・Variablesは不要です。`Settings > Pages > Build and deployment > Source` を **GitHub Actions** に設定してください。
+Release未公開のリポジトリは取り込み前に一時的に除外され、公開後の更新で取り込まれます。登録元のsource.jsonからは削除しません。
+
+VCCの `Settings > Packages > Add Repository` に次のURLを登録します。
+
+```text
+https://azipappa.github.io/azipa-tools-vpm/index.json
+```
+
+同一バージョンのZIPは公開後に差し替えず、修正時は新しいバージョンを公開してください。
