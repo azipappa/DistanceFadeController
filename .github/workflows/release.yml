@@ -1,0 +1,51 @@
+name: Release package
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - name: Check release packaging
+        run: python3 scripts/test_release.py
+      - name: Validate and build release package
+        id: package
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: python3 scripts/build_release.py --tag "$RELEASE_TAG"
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TITLE: ${{ steps.package.outputs.title }}
+          PRERELEASE: ${{ steps.package.outputs.prerelease }}
+          RELEASE_ZIP: ${{ steps.package.outputs.zip }}
+          RELEASE_CHECKSUM: ${{ steps.package.outputs.checksum }}
+          RELEASE_NOTES: ${{ steps.package.outputs.notes }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          flags=()
+          if [[ "$PRERELEASE" == "true" ]]; then
+            flags+=(--prerelease --latest=false)
+          fi
+          if gh release view "$RELEASE_TAG" >/dev/null 2>&1; then
+            gh release upload "$RELEASE_TAG" "$RELEASE_ZIP" "$RELEASE_CHECKSUM" --clobber
+          else
+            gh release create "$RELEASE_TAG" "$RELEASE_ZIP" "$RELEASE_CHECKSUM" \
+              --verify-tag --title "$RELEASE_TITLE" --notes-file "$RELEASE_NOTES" "${flags[@]}"
+          fi

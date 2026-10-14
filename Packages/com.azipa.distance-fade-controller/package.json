@@ -1,0 +1,10 @@
+{
+  "name": "com.azipa.distance-fade-controller",
+  "displayName": "DistanceFadeController",
+  "version": "0.1.0",
+  "unity": "2022.3",
+  "description": "Non-destructive lilToon distance fade overrides for VRChat avatars.",
+  "author": { "name": "azipa" },
+  "license": "MIT",
+  "vpmDependencies": { "nadena.dev.ndmf": ">=1.11.0", "com.vrchat.avatars": ">=3.5.0" }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "DistanceFadeController.Runtime",
+  "rootNamespace": "Azipa.DistanceFade",
+  "references": ["nadena.dev.ndmf.runtime"],
+  "autoReferenced": true
+}
