@@ -12,3 +12,5 @@ VRChatアバターのlilToon距離フェードを非破壊で一括設定するU
 `v0.1.0` などのバージョンタグをGitHubへ送ると、GitHub ActionsがZIP・SHA256を作成しGitHub Releaseへ添付します。`0.x.x` とプレリリース識別子のあるバージョンは自動的に **Pre-release** として公開します。
 
 VCC向けVPMリポジトリのホスティングは別途設定が必要です。現在の自動化はGitHub Releaseの公開までです。
+
+このプロジェクトは [MIT License](LICENSE) で公開しています。
